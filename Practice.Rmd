@@ -1,0 +1,127 @@
+---
+title: "Practice"
+author: "ndmawpu"
+date: "2023-02-19"
+output: html_document
+
+packages requirement: readxl, plotly, ggplot2, DataExplorer
+---
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Libraries
+```{r}
+library(tidyverse)
+library(tidyquant)
+library(dplyr)
+library(readxl)
+# Explore Data
+library(DataExplorer)
+
+# Visualization
+library(ggplot2)
+library(gridExtra)
+library(gtable)
+library(GGally)
+```
+
+
+## Data Preparation 
+```{r}
+data <- read_excel("Data/Price-Data-W2.xlsx", sheet = "Chung khoan")
+head(data,5)
+```
+## EDA
+```{r}
+glimpse(data)
+
+```
+the function show data size and structure - there are 2,655 observations and 6 features
+
+||Features|Description|
+|---|---|---|
+||ID||
+||Timestamp||
+||ACB.HM.Close||
+||ACB.HM.Volume||
+||BAB.HN.Close||
+||BAB.HN.Volume||
+
+```{r}
+introduce(data)
+```
+
+```{r}
+plot_intro(data)
+```
+
+```{r}
+plot_missing(data,
+             title = "Percent Missing Values by Features")
+```
+
+```{r}
+# summary statistics
+summary(data)
+```
+calculated mean,median,25th and 75th quartiles,min,max
+
+```{r}
+boxplot(data)
+```
+
+```{r}
+# Deleting rows where value is missing
+data <- data %>% 
+  na.omit(c(data$BAB.HN.Close, data$BAB.HN.Volume))
+```
+
+```{r}
+plot_missing(data,
+             title = "Percent Missing Values by Features")
+```
+
+## Data Visualization
+```{r}
+
+p1 <- ggplot(data, aes(x = Timestamp, y=ACB.HM.Close)) +
+  geom_line() +
+  theme_minimal()
+p2 <- ggplot(data, aes(x = Timestamp, y=BAB.HN.Close)) +
+  geom_line() +
+  theme_minimal()
+
+grid.arrange(
+  p1,
+  p2,
+  nrow = 2,
+  top = "Close price by Timestamp"
+  )
+
+```
+
+```{r}
+p3 <- ggplot(data, aes(x = Timestamp, y=ACB.HM.Volume)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+p4 <- ggplot(data, aes(x = Timestamp, y=BAB.HN.Volume)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  theme_minimal()
+grid.arrange(
+  p3,
+  p4,
+  nrow = 1,
+  top = "Sum of Volumn by Timestamp"
+)
+
+```
+
+```{r}
+ggpairs(data)
+```
+
+```{r}
+ggcorr(data)
+```
